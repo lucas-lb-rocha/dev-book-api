@@ -1,43 +1,39 @@
-CREATE DATABASE IF NOT EXISTS devbook;
-USE devbook;
+-- Tabela usuarios
+CREATE TABLE public.usuarios (
+	id serial4 NOT NULL,
+	nome varchar(50) NOT NULL,
+	nick varchar(50) NOT NULL,
+	email varchar(50) NOT NULL,
+	senha varchar(100) NOT NULL,
+	criadoem timestamp DEFAULT CURRENT_TIMESTAMP NULL,
+	CONSTRAINT usuarios_email_key UNIQUE (email),
+	CONSTRAINT usuarios_nick_key UNIQUE (nick),
+	CONSTRAINT usuarios_pkey PRIMARY KEY (id)
+);
 
-DROP TABLE IF EXISTS publicacoes;
-DROP TABLE IF EXISTS seguidores;
-DROP TABLE IF EXISTS usuarios;
+-- Tabela Seguidores
 
-CREATE TABLE usuarios(
-    id int auto_increment primary key,
-    nome varchar(50) not null,
-    nick varchar(50) not null unique,
-    email varchar(50) not null unique,
-    senha varchar(100) not null,
-    criadoEm timestamp default current_timestamp()
-) ENGINE=INNODB;
+CREATE TABLE public.seguidores (
+	usuario_id int4 NOT NULL,
+	seguidor_id int4 NOT NULL,
+	CONSTRAINT seguidores_pkey PRIMARY KEY (usuario_id, seguidor_id)
+);
 
-CREATE TABLE seguidores(
-    usuario_id int not null,
-    FOREIGN KEY (usuario_id)
-    REFERENCES usuarios(id)
-    ON DELETE CASCADE,
 
-    seguidor_id int not null,
-    FOREIGN KEY (seguidor_id)
-    REFERENCES usuarios(id)
-    ON DELETE CASCADE,
+ALTER TABLE public.seguidores ADD CONSTRAINT seguidores_seguidor_id_fkey FOREIGN KEY (seguidor_id) REFERENCES public.usuarios(id) ON DELETE CASCADE;
+ALTER TABLE public.seguidores ADD CONSTRAINT seguidores_usuario_id_fkey FOREIGN KEY (usuario_id) REFERENCES public.usuarios(id) ON DELETE CASCADE;
 
-    primary key(usuario_id, seguidor_id)
-) ENGINE=INNODB;
+-- Tabela Publicacoes
 
-CREATE TABLE publicacoes(
-    id int auto_increment primary key,
-    titulo varchar(50) not null,
-    conteudo varchar(300) not null,
+CREATE TABLE public.publicacoes (
+	id serial4 NOT NULL,
+	titulo varchar(50) NOT NULL,
+	conteudo varchar(300) NOT NULL,
+	autor_id int4 NOT NULL,
+	curtidas int4 DEFAULT 0 NULL,
+	criadaem timestamp DEFAULT CURRENT_TIMESTAMP NULL,
+	CONSTRAINT publicacoes_pkey PRIMARY KEY (id)
+);
 
-    autor_id int not null,
-    FOREIGN KEY (autor_id)
-    REFERENCES usuarios(id)
-    ON DELETE CASCADE,
 
-    curtidas int default 0,
-    criadaEm timestamp default current_timestamp
-) ENGINE=INNODB;
+ALTER TABLE public.publicacoes ADD CONSTRAINT publicacoes_autor_id_fkey FOREIGN KEY (autor_id) REFERENCES public.usuarios(id) ON DELETE CASCADE;
